@@ -1,0 +1,113 @@
+﻿@model WebVentasMongoDB.ViewModels.ProductoVM
+@{
+    ViewBag.Title = "Detalles del Producto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a href="@Url.Action("Index")" class="text-decoration-none text-dark d-inline-flex align-items-center">
+            <i class="fas fa-arrow-left me-2"></i>
+            <span>Volver a productos</span>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="product-image-container bg-light d-flex align-items-center justify-content-center p-4">
+                @if (!string.IsNullOrEmpty(Model.ImagenBase64))
+                {
+                    <img src="data:@Model.ImagenMimeType;base64,@Model.ImagenBase64"
+                         alt="@Model.Nombre"
+                         class="product-detail-img" />
+                }
+                else
+                {
+                    <div class="no-image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <div class="mt-2 small">Sin imagen disponible</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="product-info">
+                <div class="category-badge mb-2">@Model.NombreCategoria</div>
+                <h2 class="product-title fw-normal mb-3">@Model.Nombre</h2>
+                <div class="product-price mb-4">$@Model.Precio.ToString("N0")</div>
+
+                <div class="product-description mb-4">
+                    <h6 class="text-uppercase small fw-medium mb-2">Descripción</h6>
+                    <p class="text-muted">@Model.Descripcion</p>
+                </div>
+
+                <div class="product-actions mt-5">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-dark rounded-0 px-4">
+                        Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Paleta de colores minimalista */
+    :root {
+        --color-primary: #212529;
+        --color-secondary: #f8f9fa;
+        --color-accent: #e9ecef;
+        --color-text: #495057;
+        --color-light: #adb5bd;
+    }
+
+    body {
+        color: var(--color-text);
+    }
+
+    .product-image-container {
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-detail-img {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    .no-image-placeholder {
+        text-align: center;
+        color: var(--color-light);
+    }
+
+        .no-image-placeholder i {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+    .category-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        color: var(--color-text);
+        background-color: var(--color-accent);
+        padding: 0.15rem 0.5rem;
+    }
+
+    .product-title {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    .product-price {
+        font-size: 1.5rem;
+        font-weight: 500;
+    }
+
+    .product-description {
+        line-height: 1.6;
+    }
+</style>

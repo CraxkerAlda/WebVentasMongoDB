@@ -1,0 +1,131 @@
+﻿@model WebVentasMongoDB.ViewModels.AuthVM
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @class = "form", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+            <div class="login-card">
+                <div class="login-header text-center mb-4">
+                    <div class="logo-container mb-3">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3 class="fw-normal">Iniciar Sesión</h3>
+                    <p class="text-muted small">Ingrese sus credenciales para continuar</p>
+                </div>
+
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert-message">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span>@ViewBag.Message</span>
+                    </div>
+                }
+
+                <div class="form-group mb-4">
+                    <label for="NombreDeUsuario" class="form-label small fw-medium">Usuario (Correo electrónico)</label>
+                    @Html.TextBoxFor(m => m.NombreDeUsuario, new { @class = "form-control", placeholder = "ejemplo@correo.com", required = "required" })
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="Password" class="form-label small fw-medium">Contraseña</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "••••••••", required = "required" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn btn-dark w-100">Ingresar</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <p class="small">¿No tienes cuenta? <a href="@Url.Action("Register", "Auth")">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    :root {
+        --color-primary: #212529;
+        --color-secondary: #f8f9fa;
+        --color-accent: #e9ecef;
+        --color-text: #495057;
+        --color-light: #adb5bd;
+        --color-danger: #f8d7da;
+        --color-danger-text: #842029;
+    }
+
+    body {
+        background-color: var(--color-secondary);
+        color: var(--color-text);
+    }
+
+    .login-card {
+        background-color: white;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 2.5rem;
+        border-radius: 2px;
+    }
+
+    .logo-container {
+        width: 60px;
+        height: 60px;
+        background-color: var(--color-secondary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 1.8rem;
+        color: var(--color-primary);
+    }
+
+    .form-control {
+        border: 1px solid var(--color-accent);
+        border-radius: 0;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: none;
+        }
+
+    .form-label {
+        color: var(--color-text);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-dark {
+        background-color: var(--color-primary);
+        border: none;
+        border-radius: 0;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-dark:hover {
+            background-color: black;
+        }
+
+    .alert-message {
+        background-color: var(--color-danger);
+        color: var(--color-danger-text);
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+    }
+</style>

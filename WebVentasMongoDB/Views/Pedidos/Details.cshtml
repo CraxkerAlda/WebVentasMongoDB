@@ -1,0 +1,116 @@
+﻿@model WebVentasMongoDB.ViewModels.PedidoVM
+
+@{
+    ViewBag.Title = "Detalles del Pedido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    @if (Model == null)
+    {
+        <div class="alert alert-danger rounded-0 shadow-sm">
+            <h5 class="fw-normal text-danger mb-3">
+                <i class="fas fa-exclamation-triangle me-2"></i> El pedido no fue encontrado.
+            </h5>
+            @Html.ActionLink("← Volver", "MisPedidos", null, new { @class = "btn btn-outline-secondary rounded-0" })
+        </div>
+    }
+    else
+    {
+        <h3 class="fw-normal mb-4 text-center">
+            <i class="fas fa-file-invoice me-2"></i> Detalles del Pedido
+        </h3>
+
+        <div class="card shadow-sm p-4 mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Fecha:</strong>
+                    <div>@Model.FechaPedido.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Total:</strong>
+                    <div>$@Model.Total</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Estado:</strong>
+                    @{
+                        string badgeColor = "secondary";
+                        if (Model.Estado == "En proceso")
+                        {
+                            badgeColor = "warning";
+                        }
+                        else if (Model.Estado == "Enviado")
+                        {
+                            badgeColor = "info";
+                        }
+                        else if (Model.Estado == "Entregado")
+                        {
+                            badgeColor = "success";
+                        }
+                        else if (Model.Estado == "Cancelado")
+                        {
+                            badgeColor = "danger";
+                        }
+                    }
+                    <div><span class="badge bg-@badgeColor text-dark rounded-0 px-2 py-1">@Model.Estado</span></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Ciudad:</strong>
+                    <div>@Model.Ciudad</div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <strong class="text-muted">Dirección de Envío:</strong>
+                    <div>@Model.DireccionEnvio</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Teléfono de Contacto:</strong>
+                    <div>@Model.TelefonoContacto</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong class="text-muted">Método de Pago:</strong>
+                    <div>@Model.MetodoPago</div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-normal mb-3"><i class="fas fa-boxes me-2"></i> Productos</h5>
+    }
+
+    @if (Model != null && Model.Productos != null && Model.Productos.Any())
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light text-uppercase small text-muted">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Productos)
+                    {
+                        <tr>
+                            <td>@item.NombreProducto</td>
+                            <td>@item.Cantidad</td>
+                            <td>$@item.PrecioUnitario</td>
+                            <td>$@item.Subtotal</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model != null)
+    {
+        <p class="text-muted">Este pedido no contiene productos.</p>
+    }
+
+    @if (Model != null)
+    {
+        <div class="mt-4 text-center">
+            @Html.ActionLink("← Volver a mis pedidos", "MisPedidos", "Pedidos", new { @class = "btn btn-outline-secondary rounded-0" })
+        </div>
+    }
+</div>

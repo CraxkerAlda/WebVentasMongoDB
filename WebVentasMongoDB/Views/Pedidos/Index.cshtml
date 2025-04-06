@@ -1,0 +1,83 @@
+﻿@model List<WebVentasMongoDB.ViewModels.PedidoVM>
+@{
+    ViewBag.Title = "Pedidos - Administración";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var estados = new[] { "Pendiente", "En proceso", "Enviado", "Entregado", "Cancelado" };
+}
+
+<div class="container mt-5 mb-5">
+    <h3 class="fw-normal mb-4 text-center">
+        <i class="fas fa-clipboard-list me-2"></i> Gestión de Pedidos
+    </h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-0 shadow-sm">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info rounded-0">
+            <i class="fas fa-info-circle me-2"></i> No hay pedidos registrados.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr class="text-uppercase small text-muted">
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Cambiar Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in Model)
+                    {
+                        <tr>
+                            <td>@pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@pedido.IdUsuario</td>
+                            <td class="fw-normal">$@pedido.Total</td>
+                            <td>
+                                <span class="badge bg-secondary text-dark rounded-0 px-3 py-1">@pedido.Estado</span>
+                            </td>
+                            <td>
+                                @using (Html.BeginForm("ActualizarEstado", "Pedidos", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", pedido.Id)
+                                    <select name="nuevoEstado" class="form-select form-select-sm rounded-0 transition" onchange="this.form.submit()">
+                                        @foreach (var estado in estados)
+                                        {
+                                            <option value="@estado" @(estado == pedido.Estado ? "selected" : "")>@estado</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Details", new { id = pedido.Id })" class="btn btn-sm btn-outline-info rounded-0 me-2 transition">
+                                    <i class="fas fa-eye"></i> Detalles
+                                </a>
+
+                                @using (Html.BeginForm("Delete", "Pedidos", FormMethod.Post, new { onsubmit = "return confirm('¿Estás seguro de eliminar este pedido?');", style = "display:inline-block" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", pedido.Id)
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-0 transition">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

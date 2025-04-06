@@ -1,0 +1,26 @@
+﻿@model WebVentasMongoDB.ViewModels.ProductoVM
+@{
+    ViewBag.Title = "Eliminar Producto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-danger">¿Deseas eliminar este producto?</h2>
+
+<div class="mb-4">
+    <strong>Nombre:</strong> @Model.Nombre<br />
+    <strong>Descripción:</strong> @Model.Descripcion<br />
+    <strong>Precio:</strong> $@Model.Precio<br />
+    <strong>Categoría:</strong> @Model.NombreCategoria<br />
+    @if (!string.IsNullOrEmpty(Model.ImagenBase64))
+    {
+        <img src="data:image/png;base64,@Model.ImagenBase64" alt="Imagen" class="img-thumbnail mt-2" width="150" />
+    }
+</div>
+
+@using (Html.BeginForm("DeleteConfirmed", "Productos", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-secondary ms-2" })
+}

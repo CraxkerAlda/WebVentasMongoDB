@@ -1,0 +1,155 @@
+﻿@model WebVentasMongoDB.ViewModels.PedidoVM
+@using WebVentasMongoDB.ViewModels
+
+@{
+    ViewBag.Title = "Nuevo Pedido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var productos = ViewBag.Productos as IEnumerable<SelectListItem>;
+}
+
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm p-4">
+        <h3 class="fw-normal mb-4 text-center"><i class="fas fa-box-open me-2"></i> Crear nuevo pedido</h3>
+
+        @using (Html.BeginForm("Create", "Pedidos", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row align-items-end">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Producto</label>
+                    <select id="productoSelect" class="form-select rounded-0">
+                        <option value="">-- Selecciona --</option>
+                        @foreach (var item in productos)
+                        {
+                            <option value="@item.Value" data-nombre="@item.Text">@item.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Cantidad</label>
+                    <input type="number" id="cantidadInput" class="form-control rounded-0" value="1" min="1" />
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <button type="button" class="btn btn-dark w-100 rounded-0 transition" id="btnAgregar">
+                        <i class="fas fa-plus-circle me-1"></i> Agregar al pedido
+                    </button>
+                </div>
+            </div>
+
+            <hr />
+            <h5 class="fw-normal mb-3"><i class="fas fa-shopping-cart me-2"></i> Carrito</h5>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="tablaCarrito">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <input type="hidden" name="ProductosJson" id="productosJson" />
+
+            <hr class="mt-5" />
+            <h5 class="fw-normal mb-3"><i class="fas fa-truck me-2"></i> Información de Envío</h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Dirección de Envío</label>
+                    @Html.TextBoxFor(m => m.DireccionEnvio, new { @class = "form-control rounded-0", placeholder = "Calle, número, colonia..." })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Ciudad</label>
+                    @Html.TextBoxFor(m => m.Ciudad, new { @class = "form-control rounded-0" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Teléfono de Contacto</label>
+                    @Html.TextBoxFor(m => m.TelefonoContacto, new { @class = "form-control rounded-0", type = "tel" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label small text-uppercase fw-medium">Método de Pago</label>
+                    @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] { "Tarjeta", "Efectivo", "Transferencia" }), "-- Selecciona método --", new { @class = "form-select rounded-0" })
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success rounded-0">
+                    <i class="fas fa-save me-1"></i> Guardar Pedido
+                </button>
+                @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-outline-secondary rounded-0" })
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var productos = [];
+
+        document.getElementById("btnAgregar").addEventListener("click", function () {
+            var select = document.getElementById("productoSelect");
+            var id = select.value;
+            var nombre = select.options[select.selectedIndex].text;
+            var cantidad = parseInt(document.getElementById("cantidadInput").value);
+
+            if (!id || cantidad <= 0) return;
+
+            var yaExiste = productos.find(p => p.IdProducto === id);
+            if (yaExiste) {
+                yaExiste.Cantidad += cantidad;
+            } else {
+                var listaProductos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductosData));
+                var prod = listaProductos.find(p => p.Id === id);
+                if (!prod) return;
+
+                productos.push({
+                    IdProducto: id,
+                    NombreProducto: nombre,
+                    Cantidad: cantidad,
+                    PrecioUnitario: parseFloat(prod.Precio)
+                });
+            }
+
+            renderTabla();
+        });
+
+        function renderTabla() {
+            var tbody = document.querySelector("#tablaCarrito tbody");
+            tbody.innerHTML = "";
+
+            productos.forEach((p, index) => {
+                var row = `<tr>
+                    <td>${p.NombreProducto}</td>
+                    <td>${p.Cantidad}</td>
+                    <td>$${p.PrecioUnitario.toFixed(2)}</td>
+                    <td>$${(p.Cantidad * p.PrecioUnitario).toFixed(2)}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger rounded-0" onclick="eliminar(${index})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            document.getElementById("productosJson").value = JSON.stringify(productos);
+        }
+
+        function eliminar(index) {
+            productos.splice(index, 1);
+            renderTabla();
+        }
+    </script>
+}

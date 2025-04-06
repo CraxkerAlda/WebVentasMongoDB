@@ -1,0 +1,91 @@
+﻿@model WebVentasMongoDB.ViewModels.AuthVM
+
+@{
+    ViewBag.Title = "Mi Perfil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var roles = System.Security.Claims.ClaimsPrincipal.Current
+        .Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToList();
+}
+
+<div class="container mt-5 mb-5">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-sm p-4 border-0">
+            <h2 class="fw-normal mb-4 text-center text-dark">
+                <i class="fas fa-user-circle me-2 text-muted"></i> Mi Perfil
+            </h2>
+
+            <div class="mb-4">
+                <p><span class="text-muted">👤 Nombre:</span> @Model.NombreDeUsuario</p>
+                <p><span class="text-muted">📧 Correo:</span> @Model.Email</p>
+                <p>
+                    <span class="text-muted">🔐 Rol:</span>
+                    <span class="badge bg-light text-dark border rounded-0">@string.Join(", ", roles)</span>
+                </p>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <a href="@Url.Action("ChangePassword", "Auth")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                        <i class="fas fa-key me-2"></i> Cambiar Contraseña
+                    </a>
+                </div>
+
+                @if (User.IsInRole("Administrador"))
+                {
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Index", "Productos")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                            <i class="fas fa-box me-2"></i> Gestionar Productos
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Account", "Auth")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                            <i class="fas fa-user-plus me-2"></i> Registrar Usuario
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Index", "Pedidos")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                            <i class="fas fa-clipboard-list me-2"></i> Ver Pedidos
+                        </a>
+                    </div>
+                }
+
+                @if (User.IsInRole("Cliente"))
+                {
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Index", "Productos")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                            <i class="fas fa-store me-2"></i> Ver Tienda
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="@Url.Action("MisPedidos", "Pedidos")" class="d-block text-decoration-none text-dark p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                            <i class="fas fa-box-open me-2"></i> Mis Pedidos
+                        </a>
+                    </div>
+                }
+
+                <div class="col-12">
+                    <a href="@Url.Action("LogOut", "Auth")" class="d-block text-decoration-none text-danger p-3 border rounded-0 shadow-sm h-100 transition bg-white hover-shadow">
+                        <i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05) !important;
+        background-color: #f9f9f9 !important;
+        transition: all 0.3s ease;
+    }
+
+    .transition {
+        transition: all 0.3s ease;
+    }
+
+</style>

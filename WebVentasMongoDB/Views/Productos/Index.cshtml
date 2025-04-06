@@ -1,0 +1,262 @@
+﻿@model List<WebVentasMongoDB.ViewModels.ProductoVM>
+@using System.Security.Claims
+@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var roles = ClaimsPrincipal.Current.Claims
+        .Where(c => c.Type == ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToList();
+    var esAdmin = roles.Contains("Administrador");
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-light">Productos</h2>
+            <div class="text-muted small">Explora nuestra selección de artículos</div>
+        </div>
+        @if (esAdmin)
+        {
+            <div>
+                <a href="@Url.Action("Create")" class="btn btn-sm btn-outline-dark px-4 rounded-0">
+                    <i class="fas fa-plus me-2"></i>Nuevo Producto
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 my-5">
+            <div class="empty-state mb-4">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h5 class="fw-light text-secondary">No hay productos disponibles</h5>
+            @if (esAdmin)
+            {
+                <p class="text-muted small">Comienza agregando tu primer producto</p>
+                <a href="@Url.Action("Create")" class="btn btn-sm btn-dark px-4 rounded-0 mt-2">
+                    <i class="fas fa-plus me-2"></i>Agregar Producto
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-12">
+                    <div class="card border-0 rounded-0 product-card">
+                        <div class="row g-0">
+                            <div class="col-auto">
+                                <div class="product-img-wrapper">
+                                    @if (!string.IsNullOrEmpty(item.ImagenBase64))
+                                    {
+                                        <div class="product-img-container">
+                                            <img src="data:@item.ImagenMimeType;base64,@item.ImagenBase64"
+                                                 alt="@item.Nombre"
+                                                 class="product-img" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="no-image-container">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-4">
+                                            <h5 class="card-title fw-normal mb-1">@item.Nombre</h5>
+                                            <div class="category-badge">@item.NombreCategoria</div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <p class="card-text text-muted small mb-0">
+                                                @if (item.Descripcion.Length > 120)
+                                                {
+                                                    @(item.Descripcion.Substring(0, 120) + "...")
+                                                }
+                                                else
+                                                {
+                                                    @item.Descripcion
+                                                }
+                                            </p>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="product-price">$@item.Precio.ToString("N0")</div>
+                                        </div>
+                                        <div class="col-md-2 text-end">
+                                            <div class="product-actions">
+                                                <a href="@Url.Action("Details", new { id = item.Id })"
+                                                   class="action-btn"
+                                                   data-bs-toggle="tooltip"
+                                                   title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                @if (esAdmin)
+                                                {
+                                                    <a href="@Url.Action("Edit", new { id = item.Id })"
+                                                       class="action-btn"
+                                                       data-bs-toggle="tooltip"
+                                                       title="Editar producto">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", new { id = item.Id })"
+                                                       class="action-btn action-btn-danger"
+                                                       data-bs-toggle="tooltip"
+                                                       title="Eliminar producto">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    /* Paleta de colores minimalista */
+    :root {
+        --color-primary: #212529;
+        --color-secondary: #f8f9fa;
+        --color-accent: #e9ecef;
+        --color-text: #495057;
+        --color-light: #adb5bd;
+        --color-danger: #f8d7da;
+    }
+
+    body {
+        color: var(--color-text);
+    }
+
+    .product-card {
+        transition: all 0.2s ease;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+        .product-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+    .product-img-wrapper {
+        width: 100px;
+        height: 100px;
+        padding: 10px;
+        background-color: var(--color-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-img-container {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-img {
+        max-height: 80px;
+        max-width: 80px;
+        object-fit: contain;
+    }
+
+    .no-image-container {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-light);
+        font-size: 1.5rem;
+    }
+
+    .category-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        color: var(--color-text);
+        background-color: var(--color-accent);
+        padding: 0.15rem 0.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .product-price {
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text);
+        background-color: var(--color-secondary);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .action-btn:hover {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+    .action-btn-danger:hover {
+        background-color: var(--color-danger);
+        color: #842029;
+    }
+
+    .btn-outline-dark {
+        border-width: 1px;
+    }
+
+    .btn-dark {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .empty-state {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--color-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 1.8rem;
+        color: var(--color-light);
+    }
+</style>
+
+<script>
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>

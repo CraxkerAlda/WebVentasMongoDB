@@ -1,0 +1,74 @@
+﻿@model List<WebVentasMongoDB.ViewModels.PedidoVM>
+
+@{
+    ViewBag.Title = "Mis Pedidos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    <h3 class="fw-normal mb-4 text-center">
+        <i class="fas fa-box me-2"></i> Mis Pedidos
+    </h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info rounded-0 shadow-sm">
+            <i class="fas fa-info-circle me-2"></i> No tienes pedidos registrados aún.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light text-uppercase small text-muted">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Ciudad</th>
+                        <th>Método de Pago</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in Model)
+                    {
+                        string badgeColor = "secondary";
+
+                        if (pedido.Estado == "En proceso")
+                        {
+                            badgeColor = "warning";
+                        }
+                        else if (pedido.Estado == "Enviado")
+                        {
+                            badgeColor = "info";
+                        }
+                        else if (pedido.Estado == "Entregado")
+                        {
+                            badgeColor = "success";
+                        }
+                        else if (pedido.Estado == "Cancelado")
+                        {
+                            badgeColor = "danger";
+                        }
+
+                        <tr>
+                            <td>@pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-normal">$@pedido.Total</td>
+                            <td>
+                                <span class="badge bg-@badgeColor text-dark rounded-0 px-2 py-1">@pedido.Estado</span>
+                            </td>
+                            <td>@pedido.Ciudad</td>
+                            <td>@pedido.MetodoPago</td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Details", "Pedidos", new { id = pedido.Id })" class="btn btn-sm btn-outline-info rounded-0 transition">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
